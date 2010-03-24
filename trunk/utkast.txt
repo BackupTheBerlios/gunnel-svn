@@ -1,0 +1,14 @@
+Upprop:
+
+ 1.   Fristående:
+ 
+         gunnel -l port -r port -c cert -a ca -k nyckel -C chiffer
+
+ 2.   I vidareledning:
+ 
+         cat fil | gunnel -r port -c cert -a ca -k nyckel
+
+Generaliserad port:
+
+	port := nummer | värd,nummer | sockel | "pts"
+
