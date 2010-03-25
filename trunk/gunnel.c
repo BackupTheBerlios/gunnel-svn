@@ -40,10 +40,10 @@ char *remote_port_string = NULL;
 #define CA_FILE_STR		"[-a file] "
 #define KEY_FILE		'k'
 #define KEY_FILE_STR	"[-k file] "
-#define CIPHER_POLICY	'p'
-#define CIPHER_POLICY_STR	"[-p string] "
+#define CIPHER_POLICY	'C'
+#define CIPHER_POLICY_STR	"[-C string] "
 
-static const char options_string[] = "hl:r:c:k:a:p:";
+static const char options_string[] = "hl:r:c:k:a:C:";
 
 /* Semaphores for flow control. */
 int show_usage = 0;
@@ -102,6 +102,11 @@ int main(int argc, char *argv[]) {
 						break;
 			case CIPHER_POLICY:
 						ciphers = optarg;
+						break;
+			case '?':
+			default:
+						fprintf(stderr, "\n");
+						show_usage = 1;
 						break;
 		}
 	}
