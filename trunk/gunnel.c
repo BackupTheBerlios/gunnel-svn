@@ -4,6 +4,8 @@
  * Author: Mats Erik Andersson <meand@users.berlios.de>, 2010.
  *
  * License: EUPL v1.0.
+ *
+ * $Id$
  */
 
 /*
