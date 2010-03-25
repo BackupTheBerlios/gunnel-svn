@@ -43,7 +43,7 @@ char *remote_port_string = NULL;
 #define CIPHER_POLICY	'p'
 #define CIPHER_POLICY_STR	"[-p string] "
 
-const char options_string[] = "hl:r:c:k:a:p:";
+static const char options_string[] = "hl:r:c:k:a:p:";
 
 /* Semaphores for flow control. */
 int show_usage = 0;
@@ -54,7 +54,7 @@ inline const char *cover_empty_string(const char *str) {
 }; /* cover_empty_string(const char *) */
 
 /* Display usage and instantiated settings. */
-void show_info(char *progname) {
+static void show_info(char *progname) {
 	printf("Usage: %s " LOCAL_PORT_STR REMOTE_PORT_STR
 				CERT_FILE_STR CA_FILE_STR KEY_FILE_STR
 				CIPHER_POLICY_STR "\n\n",
@@ -77,6 +77,7 @@ void show_info(char *progname) {
  */
 int main(int argc, char *argv[]) {
 	int opt;
+	char message[MESSAGE_LENGTH] = "";
 
 	setlocale(LC_ALL, "");
 
@@ -112,7 +113,18 @@ int main(int argc, char *argv[]) {
 		keyfile = certificate;
 
 	if (show_usage)
+		/* Never returns. */
 		show_info(argv[0]);
+
+	/* Initiate Libgnutls with certificate, key, etcetera. */
+	if (init_tls(message, sizeof(message))) {
+		fprintf(stderr, "%s\nInit TLS failed!\n", message);
+		return EXIT_FAILURE;
+	}
+
+	fprintf(stderr, "%s", message);
+
+	deinit_tls();
 
 	return EXIT_SUCCESS;
 }; /* main(int, char *[]) */

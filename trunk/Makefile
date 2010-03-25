@@ -10,9 +10,13 @@
 # vim: set sw=4 ts=4
 #
 
-CFLAGS = -O2 -Wall
+CC = gcc
 
-OBJS = gunnel.o
+CFLAGS = -O2 -Wall $(shell libgnutls-config --cflags)
+
+LDFLAGS = $(shell libgnutls-config --libs)
+
+OBJS = gunnel.o tls.o
 
 SERVICE = gunnel
 
