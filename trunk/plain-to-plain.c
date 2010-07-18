@@ -1,5 +1,5 @@
 /*
- * plain_to_tls.c  --  receive plain, forward TLS
+ * plain_to_plain.c  --  receive plain, forward plain
  *
  * Author: Mats Erik Andersson <meand@users.berlios.de>, 2010.
  *
@@ -21,7 +21,7 @@
 #define _INCLUDE_EXTERNALS	1
 #include "gunnel.h"
 
-static const char options_string[] = "hl:r:g:u:c:k:a:C:";
+static const char options_string[] = "hl:r:g:u:";
 
 /* Semaphores for flow control. */
 static int show_usage = 0;
@@ -37,11 +37,6 @@ static void show_info(char *progname) {
 						REMOTE_PORT_STR
 						TUNNEL_USR_STR
 						TUNNEL_GRP_STR
-						"\n\t\t    "
-						CERT_FILE_STR
-						CA_FILE_STR
-						KEY_FILE_STR
-						CIPHER_POLICY_STR
 						"\n\n",
 				progname);
 
@@ -49,28 +44,20 @@ static void show_info(char *progname) {
 			"\tProcess owner:   %s\n"
 			"\tProcess group:   %s\n"
 			"\tLocal port:      %s\n"
-			"\tRemote port:     %s\n"
-			"\tCertificate:     %s\n"
-			"\tKey file:        %s\n"
-			"\tCA-chain:        %s\n"
-			"\tCipher policy:   %s\n",
+			"\tRemote port:     %s\n",
 			cover_empty_string(user_name),
 			cover_empty_string(group_name),
 			cover_empty_string(local_port_string),
-			cover_empty_string(remote_port_string),
-			cover_empty_string(certificate),
-			cover_empty_string(keyfile),
-			cover_empty_string(cafile),
-			ciphers);
+			cover_empty_string(remote_port_string)
+			);
 	exit(EXIT_FAILURE);
 }; /* show_info(char *) */
 
 /*
  * Main control for this subsystem.
  */
-int plain_to_tls(int argc, char *argv[]) {
+int plain_to_plain(int argc, char *argv[]) {
 	int opt, rc;
-	char message[MESSAGE_LENGTH] = "";
 
 	while ( (opt = getopt(argc, argv, options_string)) != -1 ) {
 		switch (opt) {
@@ -81,18 +68,6 @@ int plain_to_tls(int argc, char *argv[]) {
 						break;
 			case REMOTE_PORT:
 						remote_port_string = optarg;
-						break;
-			case CERT_FILE:
-						certificate = optarg;
-						break;
-			case CA_FILE:
-						cafile = optarg;
-						break;
-			case KEY_FILE:
-						keyfile = optarg;
-						break;
-			case CIPHER_POLICY:
-						ciphers = optarg;
 						break;
 			case TUNNEL_USR:
 						user_name = optarg;
@@ -110,10 +85,6 @@ int plain_to_tls(int argc, char *argv[]) {
 
 	/* Prepare any settings. */
 
-	/* Implicit key should be bundled with the certificate. */
-	if ( ! keyfile )
-		keyfile = certificate;
-
 	if (show_usage)
 		/* Never returns. */
 		show_info(argv[0]);
@@ -124,15 +95,5 @@ int plain_to_tls(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	/* Initiate Libgnutls with certificate, key, etcetera. */
-	if (init_tls(message, sizeof(message))) {
-		fprintf(stderr, "%s\nInit TLS failed!\n", message);
-		return EXIT_FAILURE;
-	}
-
-	fprintf(stderr, "%s", message);
-
-	deinit_tls();
-
 	return EXIT_SUCCESS;
-}; /* plain_to_tls(int, char *[]) */
+}; /* plain_to_plain(int, char *[]) */

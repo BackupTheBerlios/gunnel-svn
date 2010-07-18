@@ -17,12 +17,43 @@
 
 #define MESSAGE_LENGTH 256
 
+/* Synonyms for option flags. */
+#define LOCAL_PORT		'l'
+#define LOCAL_PORT_STR	"[-l port] "
+#define REMOTE_PORT		'r'
+#define REMOTE_PORT_STR	"[-r port] "
+#define CERT_FILE		'c'
+#define CERT_FILE_STR	"[-c file] "
+#define CA_FILE			'a'
+#define CA_FILE_STR		"[-a file] "
+#define KEY_FILE		'k'
+#define KEY_FILE_STR	"[-k file] "
+#define CIPHER_POLICY	'C'
+#define CIPHER_POLICY_STR	"[-C string] "
+#define TUNNEL_USR		'u'
+#define TUNNEL_USR_STR	"[-u uid] "
+#define TUNNEL_GRP		'g'
+#define TUNNEL_GRP_STR	"[-g gid]"
+
+/* Enumeration of identified errors. */
+enum {
+	GUNNEL_SUCCESS = 0,
+	GUNNEL_FALSE_GID,
+	GUNNEL_FALSE_UID,
+	GUNNEL_FAILED_GID,
+	GUNNEL_FAILED_UID,
+};
+
 #if _INCLUDE_EXTERNALS
 
+extern char *local_port_string;
+extern char *remote_port_string;
 extern char *certificate;
 extern char *cafile;
 extern char *keyfile;
 extern char *ciphers;    
+extern char *user_name;
+extern char *group_name;
 
 #endif /* _INCLUDE_EXTERNALS */
 
@@ -32,5 +63,10 @@ int init_tls(char *str, int maxlen);
 void deinit_tls(void);
 
 int init_tls_session(int fd, char *str, int maxlen);
+
+/* From utils.c */
+void gunnel_error_message(FILE * file, int num);
+
+int test_usr_grp(char *usr, char *grp);
 
 #endif /* _GUNNEL_H */

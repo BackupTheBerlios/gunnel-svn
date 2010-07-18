@@ -22,6 +22,24 @@
 #define _INCLUDE_EXTERNALS 0
 #include "gunnel.h"
 
+/* This is the main executable, thus is
+ * owns the globally defined variables. */
+
+/* Process descriptions. */
+char *user_name = "nobody";
+char *group_name = "nogroup";
+
+/* Authorisation entities. */
+char *certificate	= NULL;
+char *cafile		= NULL;
+char *keyfile		= NULL;
+char *ciphers		= "NORMAL";
+
+/* Tunnel constituents. */
+char *local_port_string = NULL;
+char *remote_port_string = NULL;
+
+/* Pugin descriptors. */
 static struct {
 	char *name;
 	int (*func)(int argc, char *argv[]);
