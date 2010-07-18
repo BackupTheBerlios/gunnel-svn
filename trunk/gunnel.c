@@ -15,123 +15,82 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <getopt.h>
+#include "plugins.h"
 
-#define _INCLUDE_EXTERNALS	0
+#define _INCLUDE_EXTERNALS 0
 #include "gunnel.h"
 
-/* Authorisation entities. */
-char *certificate	= NULL;
-char *cafile		= NULL;
-char *keyfile		= NULL;
-char *ciphers		= "NORMAL";
-
-/* Tunnel constituents. */
-char *local_port_string = NULL;
-char *remote_port_string = NULL;
-
-/* Synonyms for option flags. */
-#define LOCAL_PORT		'l'
-#define LOCAL_PORT_STR	"[-l port] "
-#define REMOTE_PORT		'r'
-#define REMOTE_PORT_STR	"[-r port] "
-#define CERT_FILE		'c'
-#define CERT_FILE_STR	"[-c file] "
-#define CA_FILE			'a'
-#define CA_FILE_STR		"[-a file] "
-#define KEY_FILE		'k'
-#define KEY_FILE_STR	"[-k file] "
-#define CIPHER_POLICY	'C'
-#define CIPHER_POLICY_STR	"[-C string] "
-
-static const char options_string[] = "hl:r:c:k:a:C:";
-
-/* Semaphores for flow control. */
-int show_usage = 0;
-
-/* Return "none" if argument is null. */
-inline const char *cover_empty_string(const char *str) {
-	return str ? str : "none";
-}; /* cover_empty_string(const char *) */
-
-/* Display usage and instantiated settings. */
-static void show_info(char *progname) {
-	printf("Usage: %s " LOCAL_PORT_STR REMOTE_PORT_STR
-				CERT_FILE_STR CA_FILE_STR KEY_FILE_STR
-				CIPHER_POLICY_STR "\n\n",
-				progname);
-
-	printf("Active settings:\n"
-			"\tCertificate:   %s\n"
-			"\tKey file:      %s\n"
-			"\tCA-chain:      %s\n"
-			"\tCipher policy: %s\n",
-			cover_empty_string(certificate),
-			cover_empty_string(keyfile),
-			cover_empty_string(cafile),
-			ciphers);
-	exit(EXIT_FAILURE);
-}; /* show_info(char *) */
+static struct {
+	char *name;
+	int (*func)(int argc, char *argv[]);
+} plugins[] = {
+#if USE_PLAIN_TO_TLS
+	{ "plain-to-tls", plain_to_tls },
+#endif
+#if USE_TLS_TO_PLAIN
+	{ "tls-to-plain", tls_to_plain },
+#endif
+#if USE_PLAIN_TO_PLAIN
+	{ "plain-to-plain", plain_to_plain },
+#endif
+#if USE_TLS_SNOOP
+	{ "tls-snoop", tls_snooper },
+#endif
+#if USE_PLAIN_SNOOP
+	{ "plain-snoop", plain_snooper },
+#endif
+	{ NULL, NULL }
+};	/* plugins[] */
 
 /*
- * Main control.
+ * usage() -- display existent subsystems.
  */
+
+void usage(char *prog) {
+	int j;
+
+	printf("Usage: %s service options\n", prog);
+	printf("\nHere \"service\" is either of\n");
+
+	for (j = 0; plugins[j].func; ++j)
+		printf("        %s\n", plugins[j].name);
+
+	printf("\nDisplay a subsystem's usage by calling\n\n"
+			"    %s service -h\n\n", prog);
+
+	exit(0);
+} /* usage(char *) */
+
+/*
+ * main() -- detect the relevant subsystem and hand over execution.
+ */
+
 int main(int argc, char *argv[]) {
-	int opt;
-	char message[MESSAGE_LENGTH] = "";
+	int j, found = 0;
 
 	setlocale(LC_ALL, "");
 
-	while ( (opt = getopt(argc, argv, options_string)) != -1 ) {
-		switch (opt) {
-			case 'h':	show_usage = 1;
-						break;
-			case LOCAL_PORT:
-						local_port_string = optarg;
-						break;
-			case REMOTE_PORT:
-						remote_port_string = optarg;
-						break;
-			case CERT_FILE:
-						certificate = optarg;
-						break;
-			case CA_FILE:
-						cafile = optarg;
-						break;
-			case KEY_FILE:
-						keyfile = optarg;
-						break;
-			case CIPHER_POLICY:
-						ciphers = optarg;
-						break;
-			case '?':
-			default:
-						fprintf(stderr, "\n");
-						show_usage = 1;
-						break;
-		}
+	if (argc == 1)
+		usage(argv[0]); /* No return. */
+
+	for (j = 0; plugins[j].name; ++j) {
+		if ( plugins[j].func == NULL
+				|| strcmp(argv[1], plugins[j].name) )
+			continue;
+
+		found = 1;
+		break;
 	}
 
-	/* Prepare any settings. */
-
-	/* Implicit key should be bundled with the certificate. */
-	if ( ! keyfile )
-		keyfile = certificate;
-
-	if (show_usage)
-		/* Never returns. */
-		show_info(argv[0]);
-
-	/* Initiate Libgnutls with certificate, key, etcetera. */
-	if (init_tls(message, sizeof(message))) {
-		fprintf(stderr, "%s\nInit TLS failed!\n", message);
-		return EXIT_FAILURE;
+	if (! found) {
+		printf("Unknown subsystem: %s\n\n", argv[1]);
+		usage(argv[0]); /* No return. */
 	}
 
-	fprintf(stderr, "%s", message);
+	/* Invoke the validated subsystem, recalling
+	 * to transfer the remaining arguments. */
 
-	deinit_tls();
-
-	return EXIT_SUCCESS;
-}; /* main(int, char *[]) */
+	return plugins[j].func(--argc, &argv[1]);
+} /* main(int, char *[]) */

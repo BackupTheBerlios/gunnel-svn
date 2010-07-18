@@ -10,17 +10,19 @@
 # vim: set sw=4 ts=4
 #
 
+SERVICE = gunnel
+
+SUBSERVICE = -DUSE_PLAIN_TO_TLS=1
+
 CC = gcc
 
-CFLAGS = -O2 -Wall $(shell libgnutls-config --cflags)
+CFLAGS = $(SUBSERVICE) -O2 -Wall $(shell libgnutls-config --cflags)
 
 LDFLAGS = $(shell libgnutls-config --libs)
 
-OBJS = gunnel.o tls.o
+OBJS = gunnel.o tls.o plain-to-tls.o
 
-SERVICE = gunnel
-
-HEADERS = gunnel.h
+HEADERS = gunnel.h plugins.h
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ $<
