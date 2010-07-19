@@ -34,3 +34,4 @@ $(SERVICE): $(OBJS)
 
 clean rensa:
 	rm -f $(OBJS) $(SERVICE)
+	$(MAKE) -C test/ clean

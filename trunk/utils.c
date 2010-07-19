@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <pwd.h>
@@ -26,14 +27,14 @@ static struct {
 	unsigned short num;
 	char *msg;
 } error_list[] = {
-	{ GUNNEL_FALSE_GID, "Invalid group name."},
-	{ GUNNEL_FALSE_UID, "Invalid user name."},
+	{ GUNNEL_INVALID_GID, "Invalid group name."},
+	{ GUNNEL_INVALID_UID, "Invalid user name."},
 	{ GUNNEL_FAILED_GID, "Unable to set desired GID."},
 	{ GUNNEL_FAILED_UID, "Unable to set desired UID."},
 	{ 0, NULL}
 };
 
-/*
+/**
  * gunnel_error_message  --  produce an error description
  */
 
@@ -55,7 +56,7 @@ void gunnel_error_message(FILE * file, int num) {
 	return;
 }; /* gunnel_error_message(FILE *, int) */
 
-/*
+/**
  * test_usr_grp  --  test a proposed gid/uid change
  *
  * Non-zero return indicates failures.
@@ -68,10 +69,10 @@ int test_usr_grp(char *usr, char *grp) {
 	int rc;
 
 	if ( (group = getgrnam(grp)) == NULL )
-		return GUNNEL_FALSE_GID;
+		return GUNNEL_INVALID_GID;
 
 	if ( (passwd = getpwnam(usr)) == NULL )
-		return GUNNEL_FALSE_UID;
+		return GUNNEL_INVALID_UID;
 
 	/* Fork off a process to see if setting of
 	 * GID and UID is feasible. */
@@ -103,3 +104,50 @@ int test_usr_grp(char *usr, char *grp) {
 
 	return WEXITSTATUS(rc);
 }; /* test_usr_grp(char *, char *) */
+
+/**
+ * decompose_port  --  parse a generalized port
+ *
+ * The identified parts are returned in *host, *port.
+ * The corresponding strings should be return by free(3)
+ * when done with.
+ */
+int decompose_port(const char *gport, char **host, char **port) {
+	char *token;
+
+	*host = *port = NULL;
+
+	if (gport == NULL || gport[0] == '\0')
+		return GUNNEL_INVALID_PORT;
+
+	if ( (*host = strdup(gport)) == NULL )
+		return GUNNEL_ALLOCATION_FAILURE;
+
+	if ((token = strrchr(*host, ','))) {
+		*token = '\0';
+		++token;	/* Skip the separator character. */
+	}
+
+	if ( token == NULL || *token == '\0' ) {
+		/* The generalised port has a single component.
+		 * Decide on relevant specification type. */
+		if ( *host[0] == '/' )
+			/* Unix socket path! */
+			return GUNNEL_SUCCESS;
+
+		/* String goes as port specification! */
+		*port = *host;
+		*host = NULL;
+		return GUNNEL_SUCCESS;
+	}
+
+	/* Both components have been detected. */
+
+	if ( (*port = strdup(token)) == NULL ) {
+		free(*host);
+		*host = NULL;
+		return GUNNEL_ALLOCATION_FAILURE;
+	}
+
+	return GUNNEL_SUCCESS;
+}; /* decompose_port(const char *, char **, char **) */

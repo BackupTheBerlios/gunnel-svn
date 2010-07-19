@@ -38,10 +38,12 @@
 /* Enumeration of identified errors. */
 enum {
 	GUNNEL_SUCCESS = 0,
-	GUNNEL_FALSE_GID,
-	GUNNEL_FALSE_UID,
+	GUNNEL_INVALID_GID,
+	GUNNEL_INVALID_UID,
 	GUNNEL_FAILED_GID,
 	GUNNEL_FAILED_UID,
+	GUNNEL_INVALID_PORT,
+	GUNNEL_ALLOCATION_FAILURE,
 };
 
 #if _INCLUDE_EXTERNALS
@@ -68,5 +70,7 @@ int init_tls_session(int fd, char *str, int maxlen);
 void gunnel_error_message(FILE * file, int num);
 
 int test_usr_grp(char *usr, char *grp);
+
+int decompose_port(const char *gport, char **host, char **port);
 
 #endif /* _GUNNEL_H */
