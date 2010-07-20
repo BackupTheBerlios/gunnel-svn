@@ -215,6 +215,11 @@ int establish_tunnel(int sd, char *rhost, char *rport) {
 
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
+	close(sd);		/* The listening socket. */
+
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 
 	/* Change UID/GID in child process.
 	 * The feasibility has previously been

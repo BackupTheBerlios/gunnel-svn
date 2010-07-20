@@ -40,7 +40,9 @@
 #define TUNNEL_USR		'u'
 #define TUNNEL_USR_STR	"[-u uid] "
 #define TUNNEL_GRP		'g'
-#define TUNNEL_GRP_STR	"[-g gid]"
+#define TUNNEL_GRP_STR	"[-g gid] "
+#define ONE_SHOT		'o'
+#define ONE_SHOT_STR	"[-o] "
 
 /* Enumeration of identified errors. */
 enum {
