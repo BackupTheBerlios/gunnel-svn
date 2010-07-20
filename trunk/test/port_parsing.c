@@ -34,6 +34,8 @@ struct {
 	{ GUNNEL_SUCCESS, "https", NULL, "https"},
 	/* Hostname and port. */
 	{ GUNNEL_SUCCESS, "::1,smtp", "::1", "smtp"},
+	/* Degenerate simple port. */
+	{ GUNNEL_SUCCESS, ",http", NULL, "http"},
 	/* With multiple commata, catch the right-most delimiter. */
 	{ GUNNEL_SUCCESS, "adam,bero,caesar", "adam,bero", "caesar"},
 	/* The next case is impossible outcome, thus halts. */

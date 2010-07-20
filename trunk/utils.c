@@ -27,10 +27,15 @@ static struct {
 	unsigned short num;
 	char *msg;
 } error_list[] = {
+	{ GUNNEL_FORKING, "Unable to accomplish forking."},
 	{ GUNNEL_INVALID_GID, "Invalid group name."},
 	{ GUNNEL_INVALID_UID, "Invalid user name."},
 	{ GUNNEL_FAILED_GID, "Unable to set desired GID."},
 	{ GUNNEL_FAILED_UID, "Unable to set desired UID."},
+	{ GUNNEL_INVALID_PORT, "Incorrect generalised port."},
+	{ GUNNEL_ALLOCATION_FAILURE, "Unable to allocate memory."},
+	{ GUNNEL_FAILED_REMOTE_CONN, "Unable to build remote connection."},
+	{ GUNNEL_FAILED_REMOTELY, "Remote host failed."},
 	{ 0, NULL}
 };
 
@@ -99,6 +104,10 @@ int test_usr_grp(char *usr, char *grp) {
 		exit(GUNNEL_SUCCESS);
 	} /* Child process. */
 
+	/* Capture complete failure. */
+	if (pid < 0)
+		return GUNNEL_FORKING;
+
 	/* Parent process must get return status of child. */
 	waitpid(pid, &rc, 0);
 
@@ -149,5 +158,23 @@ int decompose_port(const char *gport, char **host, char **port) {
 		return GUNNEL_ALLOCATION_FAILURE;
 	}
 
-	return GUNNEL_SUCCESS;
+	/* Tidy an empty host. */
+	if ( *host && (*host[0] == '\0') ) {
+		free(*host);
+		*host = NULL;
+	}
+
+	if (*host || *port)
+		return GUNNEL_SUCCESS;
+	else
+		return GUNNEL_INVALID_PORT;
 }; /* decompose_port(const char *, char **, char **) */
+
+/**
+ * route_content  --  get content from source, send to sink
+ */
+
+#if 0
+int route_content(int source, int sink, int flags) {
+}; /* route_content(int, int, int) */
+#endif

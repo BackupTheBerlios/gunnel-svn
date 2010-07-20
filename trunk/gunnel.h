@@ -12,10 +12,17 @@
 #  define _GUNNEL_H	1
 
 #include <errno.h>
-#include <libintl.h>
 #include <locale.h>
 
 #define MESSAGE_LENGTH 256
+
+#ifndef FORKDIR
+#  if defined(__OpenBSD__) || defined(__FreeBSD__)
+#    define FORKDIR	"/var/empty"
+#  else
+#    define FORKDIR	"/"
+#  endif
+#endif
 
 /* Synonyms for option flags. */
 #define LOCAL_PORT		'l'
@@ -38,12 +45,15 @@
 /* Enumeration of identified errors. */
 enum {
 	GUNNEL_SUCCESS = 0,
+	GUNNEL_FORKING,
 	GUNNEL_INVALID_GID,
 	GUNNEL_INVALID_UID,
 	GUNNEL_FAILED_GID,
 	GUNNEL_FAILED_UID,
 	GUNNEL_INVALID_PORT,
 	GUNNEL_ALLOCATION_FAILURE,
+	GUNNEL_FAILED_REMOTE_CONN,
+	GUNNEL_FAILED_REMOTELY,
 };
 
 #if _INCLUDE_EXTERNALS
@@ -73,4 +83,5 @@ int test_usr_grp(char *usr, char *grp);
 
 int decompose_port(const char *gport, char **host, char **port);
 
+int route_content(int source, int sink, int flags);
 #endif /* _GUNNEL_H */
