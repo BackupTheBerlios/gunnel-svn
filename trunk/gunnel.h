@@ -68,6 +68,7 @@ extern char *keyfile;
 extern char *ciphers;    
 extern char *user_name;
 extern char *group_name;
+extern int again;
 
 #endif /* _INCLUDE_EXTERNALS */
 
@@ -85,5 +86,13 @@ int test_usr_grp(char *usr, char *grp);
 
 int decompose_port(const char *gport, char **host, char **port);
 
+void signal_responder(int sig);
+
 int route_content(int source, int sink, int flags);
+
+/* Drop privileges, become daemon. */
+int underpriv_daemon_mode(void);
+
+int get_listening_socket(char *lhost, char *lport);
+
 #endif /* _GUNNEL_H */

@@ -14,6 +14,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <pwd.h>
 #include <grp.h>
 
@@ -171,6 +173,23 @@ int decompose_port(const char *gport, char **host, char **port) {
 }; /* decompose_port(const char *, char **, char **) */
 
 /**
+ * signal_responder  --  respond to select signals
+ */
+
+void signal_responder(int sig) {
+	switch (sig) {
+		case SIGTERM:
+			again = 0;
+			break;
+		case SIGCHLD:
+			while ( waitpid(-1, NULL, WNOHANG) > 0 )
+				;
+		default:
+			break;
+	}
+}; /* signal_responder(int) */
+
+/**
  * route_content  --  get content from source, send to sink
  */
 
@@ -178,3 +197,123 @@ int decompose_port(const char *gport, char **host, char **port) {
 int route_content(int source, int sink, int flags) {
 }; /* route_content(int, int, int) */
 #endif
+
+/**
+ * Change GID/UID and enter daemon mode.
+ */
+int underpriv_daemon_mode(void) {
+	pid_t pid;
+	struct passwd *passwd;
+	struct group *group;
+
+	signal(SIGTERM, signal_responder);
+	signal(SIGCHLD, signal_responder);
+
+	/* Forking and intending an underprivileged
+	 * process owner. */
+	switch (pid = fork()) {
+		case -1:
+			/* Failure */
+			return GUNNEL_FORKING;
+			break;
+		case 0:
+			/* Child process continues the work. */
+			break;
+		default:
+			/* Parent process only exits. */
+			exit(GUNNEL_SUCCESS);
+			break;
+	}
+
+	if (setsid() < 0)
+		return GUNNEL_FORKING;
+
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+
+	chdir(FORKDIR);
+
+	/* Change UID/GID in child process.
+	 * The feasibility has previously been
+	 * asserted. */
+	group = getgrnam(group_name);
+	passwd = getpwnam(user_name);
+
+	/* Must begin with setgid! */
+	if ( setgid(group->gr_gid) < 0 )
+		return GUNNEL_FAILED_GID;
+
+	/* Commence with UID. */
+	if ( setuid(passwd->pw_uid) < 0 )
+		return GUNNEL_FAILED_UID;
+
+	switch (pid = fork()) {
+		case -1:
+			return GUNNEL_FORKING;
+			break;
+		case 0:
+			/* Worker child process. */
+			break;
+		default:
+			/* Intermediary parent is expendable. */
+			exit(GUNNEL_SUCCESS);
+			break;
+	}
+
+	/* Now all error messages are superfluous. */
+	close(STDERR_FILENO);
+
+	return GUNNEL_SUCCESS;
+}; /* underpriv_daemon_mode(void) */
+
+/**
+ * get_listening_socket -- examine local host, get socket
+ */
+
+int get_listening_socket(char *lhost, char *lport) {
+	int rc, sd = -1;
+	struct addrinfo hints, *ai, *aiptr;
+
+	memset(&hints, '\0', sizeof(hints));
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = AF_UNSPEC;
+#if defined(__linux__) || defined(__FreeBSD__)
+	hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
+#else
+	hints.ai_flags = AI_PASSIVE;
+#endif
+
+	if ( (rc = getaddrinfo(lhost, lport, &hints, &aiptr)) ) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+		return -1;
+	}
+
+	for ( ai = aiptr; ai; ai = ai->ai_next ) {
+		int one = 1;
+
+		if ( (sd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)) < 0 )
+			continue;
+
+		setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+
+		if ( bind(sd, ai->ai_addr, ai->ai_addrlen) == 0 )
+			if ( listen(sd, 5) == 0 )
+				break;	/* Successful. */
+
+		close(sd);
+		sd = -1;
+	}
+
+	freeaddrinfo(aiptr);
+
+	if ( ai == NULL ) {
+		fprintf(stderr, "Could not bind to local address.\n");
+		return -1;
+	}
+
+	return sd;
+}; /* get_listening_socket(char *, char *) */

@@ -39,6 +39,9 @@ char *ciphers		= "NORMAL";
 char *local_port_string = NULL;
 char *remote_port_string = NULL;
 
+/* Looping control. */
+int again = 1;
+
 /* Pugin descriptors. */
 static struct {
 	char *name;

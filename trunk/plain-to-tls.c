@@ -21,7 +21,7 @@
 #define _INCLUDE_EXTERNALS	1
 #include "gunnel.h"
 
-static const char options_string[] = "hl:r:g:u:c:k:a:C:";
+static const char options_string[] = "hl:r:g:u:c:k:a:C:o";
 
 /* Semaphores for flow control. */
 static int show_usage = 0;
@@ -37,6 +37,7 @@ static void show_info(char *progname) {
 						REMOTE_PORT_STR
 						TUNNEL_USR_STR
 						TUNNEL_GRP_STR
+						ONE_SHOT_STR
 						"\n\t\t    "
 						CERT_FILE_STR
 						CA_FILE_STR
@@ -50,6 +51,7 @@ static void show_info(char *progname) {
 			"\tProcess group:   %s\n"
 			"\tLocal port:      %s\n"
 			"\tRemote port:     %s\n"
+			"\tOne shot server: %s\n"
 			"\tCertificate:     %s\n"
 			"\tKey file:        %s\n"
 			"\tCA-chain:        %s\n"
@@ -58,10 +60,12 @@ static void show_info(char *progname) {
 			cover_empty_string(group_name),
 			cover_empty_string(local_port_string),
 			cover_empty_string(remote_port_string),
+			again ? "false" : "true",
 			cover_empty_string(certificate),
 			cover_empty_string(keyfile),
 			cover_empty_string(cafile),
-			ciphers);
+			ciphers
+			);
 	exit(EXIT_FAILURE);
 }; /* show_info(char *) */
 
@@ -69,8 +73,10 @@ static void show_info(char *progname) {
  * Main control for this subsystem.
  */
 int plain_to_tls(int argc, char *argv[]) {
-	int opt, rc;
+	int opt, rc, sd = -1;
 	char message[MESSAGE_LENGTH] = "";
+	char *lhost, *lport;
+	char *rhost, *rport;
 
 	while ( (opt = getopt(argc, argv, options_string)) != -1 ) {
 		switch (opt) {
@@ -100,6 +106,9 @@ int plain_to_tls(int argc, char *argv[]) {
 			case TUNNEL_GRP:
 						group_name = optarg;
 						break;
+			case ONE_SHOT:
+						again = 0;
+						break;
 			case '?':
 			default:
 						fprintf(stderr, "\n");
@@ -124,6 +133,24 @@ int plain_to_tls(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	if ( local_port_string == NULL
+			|| remote_port_string == NULL ) {
+		fprintf(stderr, "Missing port descriptions.\n");
+		return EXIT_FAILURE;
+	}
+
+	if ( (rc = decompose_port(local_port_string, &lhost, &lport)) ) {
+		fprintf(stderr, "Local port: ");
+		gunnel_error_message(stderr, rc);
+		return EXIT_FAILURE;
+	}
+
+	if ( (rc = decompose_port(remote_port_string, &rhost, &rport)) ) {
+		fprintf(stderr, "Remote port: ");
+		gunnel_error_message(stderr, rc);
+		return EXIT_FAILURE;
+	}
+
 	/* Initiate Libgnutls with certificate, key, etcetera. */
 	if (init_tls(message, sizeof(message))) {
 		fprintf(stderr, "%s\nInit TLS failed!\n", message);
@@ -131,8 +158,10 @@ int plain_to_tls(int argc, char *argv[]) {
 	}
 
 	fprintf(stderr, "%s", message);
+	atexit(deinit_tls);
 
-	deinit_tls();
+	if ( (sd = get_listening_socket(lhost, lport)) < 0 )
+		return EXIT_FAILURE;
 
 	return EXIT_SUCCESS;
 }; /* plain_to_tls(int, char *[]) */

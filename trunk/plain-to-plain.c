@@ -33,10 +33,6 @@ static const char options_string[] = "hl:r:g:u:o";
 
 /* Semaphores for flow control. */
 static int show_usage = 0;
-static int again = 1;
-
-/* Drop privileges, become daemon. */
-int underpriv_daemon_mode(void);
 
 /* Traffic exchanger. */
 static void transmitter(int td, int rd);
@@ -74,23 +70,6 @@ static void show_info(char *progname) {
 	exit(EXIT_FAILURE);
 }; /* show_info(char *) */
 
-/**
- * signal_responder  --  respond to select signals
- */
-
-static void signal_responder(int sig) {
-	switch (sig) {
-		case SIGTERM:
-			again = 0;
-			break;
-		case SIGCHLD:
-			while ( waitpid(-1, NULL, WNOHANG) > 0 )
-				;
-		default:
-			break;
-	}
-}; /* signal_responder(int) */
-
 /*
  * Main control for this subsystem.
  */
@@ -98,7 +77,6 @@ int plain_to_plain(int argc, char *argv[]) {
 	int opt, rc, sd = -1;
 	char *lhost, *rhost;
 	char *lport, *rport;
-	struct addrinfo hints, *ai, *aiptr;
 
 	while ( (opt = getopt(argc, argv, options_string)) != -1 ) {
 		switch (opt) {
@@ -157,42 +135,8 @@ int plain_to_plain(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	memset(&hints, '\0', sizeof(hints));
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_family = AF_UNSPEC;
-#if defined(__linux__) || defined(__FreeBSD__)
-	hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
-#else
-	hints.ai_flags = AI_PASSIVE;
-#endif
-
-	if ( (rc = getaddrinfo(lhost, lport, &hints, &aiptr)) ) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+	if ( (sd = get_listening_socket(lhost, lport)) < 0 )
 		return EXIT_FAILURE;
-	}
-
-	for ( ai = aiptr; ai; ai = ai->ai_next ) {
-		int one = 1;
-
-		if ( (sd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)) < 0 )
-			continue;
-
-		setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-
-		if ( bind(sd, ai->ai_addr, ai->ai_addrlen) == 0 )
-			if ( listen(sd, 5) == 0 )
-				break;	/* Successful. */
-
-		close(sd);
-		sd = -1;
-	}
-
-	freeaddrinfo(aiptr);
-
-	if ( ai == NULL ) {
-		fprintf(stderr, "Could not bind to local address.\n");
-		return EXIT_FAILURE;
-	}
 
 	if ( (rc = underpriv_daemon_mode()) != GUNNEL_SUCCESS )
 		return rc;
@@ -365,75 +309,3 @@ static int accept_loop(int sd, char *rhost, char *rport) {
 
 	exit(GUNNEL_SUCCESS);
 }; /* accept_loop(int, char *, char *) */
-
-/**
- * Change GID/UID and enter daemon mode.
- */
-int underpriv_daemon_mode(void) {
-	pid_t pid;
-	struct passwd *passwd;
-	struct group *group;
-
-	signal(SIGTERM, signal_responder);
-	signal(SIGCHLD, signal_responder);
-
-	/* Forking and intending an underprivileged
-	 * process owner. */
-	switch (pid = fork()) {
-		case -1:
-			/* Failure */
-			return GUNNEL_FORKING;
-			break;
-		case 0:
-			/* Child process continues the work. */
-			break;
-		default:
-			/* Parent process only exits. */
-			exit(GUNNEL_SUCCESS);
-			break;
-	}
-
-	if (setsid() < 0)
-		return GUNNEL_FORKING;
-
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-
-	signal(SIGHUP, SIG_IGN);
-	signal(SIGINT, SIG_IGN);
-	signal(SIGTSTP, SIG_IGN);
-
-	chdir(FORKDIR);
-
-	/* Change UID/GID in child process.
-	 * The feasibility has previously been
-	 * asserted. */
-	group = getgrnam(group_name);
-	passwd = getpwnam(user_name);
-
-	/* Must begin with setgid! */
-	if ( setgid(group->gr_gid) < 0 )
-		return GUNNEL_FAILED_GID;
-
-	/* Commence with UID. */
-	if ( setuid(passwd->pw_uid) < 0 )
-		return GUNNEL_FAILED_UID;
-
-	switch (pid = fork()) {
-		case -1:
-			return GUNNEL_FORKING;
-			break;
-		case 0:
-			/* Worker child process. */
-			break;
-		default:
-			/* Intermediary parent is expendable. */
-			exit(GUNNEL_SUCCESS);
-			break;
-	}
-
-	/* Now all error messages are superfluous. */
-	close(STDERR_FILENO);
-
-	return GUNNEL_SUCCESS;
-}; /* underpriv_daemon_mode(void) */
