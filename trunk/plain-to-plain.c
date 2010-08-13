@@ -43,7 +43,7 @@ static int accept_loop(int sd, char *rhost, char *rport);
 /* Return "none" if argument is null. */
 static inline const char *cover_empty_string(const char *str) {
 	return str ? str : "none";
-}; /* cover_empty_string(const char *) */
+} /* cover_empty_string(const char *) */
 
 /* Display usage and instantiated settings. */
 static void show_info(char *progname) {
@@ -68,7 +68,7 @@ static void show_info(char *progname) {
 			again ? "false" : "true"
 			);
 	exit(EXIT_FAILURE);
-}; /* show_info(char *) */
+} /* show_info(char *) */
 
 /*
  * Main control for this subsystem.
@@ -138,6 +138,10 @@ int plain_to_plain(int argc, char *argv[]) {
 	if ( (sd = get_listening_socket(lhost, lport)) < 0 )
 		return EXIT_FAILURE;
 
+	free(lhost);
+	free(lport);
+
+	/* Resign as much privilege as possible. */
 	if ( (rc = underpriv_daemon_mode()) != GUNNEL_SUCCESS )
 		return rc;
 
@@ -147,7 +151,7 @@ int plain_to_plain(int argc, char *argv[]) {
 	close(sd);
 
 	return rc;
-}; /* plain_to_plain(int, char *[]) */
+} /* plain_to_plain(int, char *[]) */
 
 /**
  * transmitter  --  send data to and fro
@@ -221,7 +225,7 @@ static void transmitter(int td, int rd) {
 	shutdown(td, SHUT_RDWR);
 	close(rd);
 	close(td);
-}; /* transmitter(int, int) */
+} /* transmitter(int, int) */
 
 static int accept_loop(int sd, char *rhost, char *rport) {
 	int ret, td = -1, rd = -1;
@@ -245,7 +249,7 @@ static int accept_loop(int sd, char *rhost, char *rport) {
 		memset(&hints, '\0', sizeof(hints));
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
-#if defined(__linux__) || defined(__FreeBSD__)
+#if defined(AI_ADDRCONFIG)
 		hints.ai_flags = AI_ADDRCONFIG;
 #endif
 
@@ -308,4 +312,4 @@ static int accept_loop(int sd, char *rhost, char *rport) {
 	} while (again);
 
 	exit(GUNNEL_SUCCESS);
-}; /* accept_loop(int, char *, char *) */
+} /* accept_loop(int, char *, char *) */

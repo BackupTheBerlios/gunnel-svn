@@ -12,13 +12,15 @@
 
 SERVICE = gunnel
 
+ALL = $(SERVICE) tests
+
 SUBSERVICE = -DUSE_PLAIN_TO_TLS=1 -DUSE_PLAIN_TO_PLAIN=1
 
 CC = gcc
 
-CFLAGS = $(SUBSERVICE) -O2 -Wall $(shell libgnutls-config --cflags)
+CFLAGS += $(SUBSERVICE) -O2 -pedantic -Wall $(shell libgnutls-config --cflags)
 
-LDFLAGS = $(shell libgnutls-config --libs)
+LDFLAGS += $(shell libgnutls-config --libs)
 
 OBJS = gunnel.o utils.o tls.o plain-to-tls.o plain-to-plain.o
 
@@ -30,7 +32,12 @@ $(SERVICE): $(OBJS)
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-.PHONY: clean rensa
+.PHONY: clean rensa tests all
+
+all: $(ALL)
+
+tests:
+	$(MAKE) -C test/ all
 
 clean rensa:
 	rm -f $(OBJS) $(SERVICE)

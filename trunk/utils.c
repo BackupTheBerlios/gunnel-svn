@@ -61,7 +61,7 @@ void gunnel_error_message(FILE * file, int num) {
 
 	fprintf(file, "An unknown error has occurred.\n");
 	return;
-}; /* gunnel_error_message(FILE *, int) */
+} /* gunnel_error_message(FILE *, int) */
 
 /**
  * test_usr_grp  --  test a proposed gid/uid change
@@ -114,7 +114,7 @@ int test_usr_grp(char *usr, char *grp) {
 	waitpid(pid, &rc, 0);
 
 	return WEXITSTATUS(rc);
-}; /* test_usr_grp(char *, char *) */
+} /* test_usr_grp(char *, char *) */
 
 /**
  * decompose_port  --  parse a generalized port
@@ -170,7 +170,7 @@ int decompose_port(const char *gport, char **host, char **port) {
 		return GUNNEL_SUCCESS;
 	else
 		return GUNNEL_INVALID_PORT;
-}; /* decompose_port(const char *, char **, char **) */
+} /* decompose_port(const char *, char **, char **) */
 
 /**
  * signal_responder  --  respond to select signals
@@ -179,6 +179,9 @@ int decompose_port(const char *gport, char **host, char **port) {
 void signal_responder(int sig) {
 	switch (sig) {
 		case SIGTERM:
+			exit(0);
+			break;
+		case SIGUSR1:
 			again = 0;
 			break;
 		case SIGCHLD:
@@ -187,7 +190,7 @@ void signal_responder(int sig) {
 		default:
 			break;
 	}
-}; /* signal_responder(int) */
+} /* signal_responder(int) */
 
 /**
  * route_content  --  get content from source, send to sink
@@ -207,6 +210,7 @@ int underpriv_daemon_mode(void) {
 	struct group *group;
 
 	signal(SIGTERM, signal_responder);
+	signal(SIGUSR1, signal_responder);
 	signal(SIGCHLD, signal_responder);
 
 	/* Forking and intending an underprivileged
@@ -268,7 +272,7 @@ int underpriv_daemon_mode(void) {
 	close(STDERR_FILENO);
 
 	return GUNNEL_SUCCESS;
-}; /* underpriv_daemon_mode(void) */
+} /* underpriv_daemon_mode(void) */
 
 /**
  * get_listening_socket -- examine local host, get socket
@@ -316,4 +320,4 @@ int get_listening_socket(char *lhost, char *lport) {
 	}
 
 	return sd;
-}; /* get_listening_socket(char *, char *) */
+} /* get_listening_socket(char *, char *) */

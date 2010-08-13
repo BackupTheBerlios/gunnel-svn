@@ -15,6 +15,12 @@
 
 #include "../gunnel.h"
 
+/* Replacement for global variables with external linking. */
+int again = 0;
+char *group_name = "nogroup";
+char *user_name = "nobody";
+
+/* Precalculated test cases and their expected results. */
 struct {
 	int retval;
 	char *gport;
@@ -46,7 +52,7 @@ int main(int argc, char *argv[]) {
 	int j, num = 0, retval;
 	char *host, *port;
 
-	fprintf(stderr, "Tests in decomposing a generalized port.\n");
+	fprintf(stderr, "Tests for decomposing a generalized port.\n");
 
 	for (j = 0; (tcase[j].gport != NULL)
 				|| (tcase[j].retval != GUNNEL_SUCCESS); ++j) {
@@ -78,4 +84,4 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Successfully decomposed %d port descriptions.\n", j);
 
 	return num;
-}; /* main() */
+} /* main() */

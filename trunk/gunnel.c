@@ -72,7 +72,8 @@ static struct {
 void usage(char *prog) {
 	int j;
 
-	printf("Usage: %s service options\n", prog);
+	printf("\nUsage:   %s service options\n", prog);
+	printf("   or:   service options\n");
 	printf("\nHere \"service\" is either of\n");
 
 	for (j = 0; plugins[j].func; ++j)
@@ -81,7 +82,7 @@ void usage(char *prog) {
 	printf("\nDisplay a subsystem's usage by calling\n\n"
 			"    %s service -h\n\n", prog);
 
-	exit(0);
+	exit(1);
 } /* usage(char *) */
 
 /*
@@ -89,29 +90,48 @@ void usage(char *prog) {
  */
 
 int main(int argc, char *argv[]) {
-	int j, found = 0;
-
+	int j, found = 0, found_short = 0;
+	char *prog;
+	
 	setlocale(LC_ALL, "");
 
+	prog = strrchr(argv[0], '/');
+	if ( (prog == NULL) || (prog[1] == '\0') )
+		prog = argv[0];
+	else
+		++prog;	/* Valid base name of executable. */
+
 	if (argc == 1)
-		usage(argv[0]); /* No return. */
+		usage(MAIN_PROG); /* No return. */
 
 	for (j = 0; plugins[j].name; ++j) {
-		if ( plugins[j].func == NULL
-				|| strcmp(argv[1], plugins[j].name) )
+		if ( plugins[j].func == NULL )
+			continue;
+
+		if ( strcmp(prog, plugins[j].name)
+				&& strcmp(argv[1], plugins[j].name) )
 			continue;
 
 		found = 1;
+		if ( strcmp(argv[1], plugins[j].name) == 0 ) {
+			/* Advance argument counter and pointer
+			 * since a long call has been issued. */
+			--argc;
+			++argv;
+		}
+		else
+			 found_short = 1;
 		break;
 	}
 
 	if (! found) {
-		printf("Unknown subsystem: %s\n\n", argv[1]);
-		usage(argv[0]); /* No return. */
+		printf("Unknown subsystem: %s\n",
+				strcmp(MAIN_PROG, prog) ? prog : argv[1]);
+		usage(MAIN_PROG); /* No return. */
 	}
 
 	/* Invoke the validated subsystem, recalling
 	 * to transfer the remaining arguments. */
 
-	return plugins[j].func(--argc, &argv[1]);
+	return plugins[j].func(argc, argv);
 } /* main(int, char *[]) */

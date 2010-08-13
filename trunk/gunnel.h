@@ -14,6 +14,12 @@
 #include <errno.h>
 #include <locale.h>
 
+#include <gnutls/gnutls.h>
+
+#ifndef MAIN_PROG
+#  define MAIN_PROG	"gunnel"
+#endif
+
 #define MESSAGE_LENGTH 256
 
 #ifndef FORKDIR
@@ -55,7 +61,7 @@ enum {
 	GUNNEL_INVALID_PORT,
 	GUNNEL_ALLOCATION_FAILURE,
 	GUNNEL_FAILED_REMOTE_CONN,
-	GUNNEL_FAILED_REMOTELY,
+	GUNNEL_FAILED_REMOTELY
 };
 
 #if _INCLUDE_EXTERNALS
@@ -73,14 +79,18 @@ extern int again;
 #endif /* _INCLUDE_EXTERNALS */
 
 /* From tls.c */
-int init_tls(char *str, int maxlen);
+int init_tls_server(char *msg, int maxlen);
 
-void deinit_tls(void);
+void deinit_tls_server(void);
 
-int init_tls_session(int fd, char *str, int maxlen);
+int init_tls_client(char *msg, int maxlen);
+
+void deinit_tls_client(void);
+
+int init_tls_session(int fd, gnutls_session_t *sess, char *msg, int maxlen);
 
 /* From utils.c */
-void gunnel_error_message(FILE * file, int num);
+void gunnel_error_message(FILE *file, int num);
 
 int test_usr_grp(char *usr, char *grp);
 

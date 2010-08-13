@@ -15,7 +15,7 @@
 #ifndef _PLUGINS_H
 #  define _PLUGINS_H 1
 
-//typedef int (*func)(int argc, char *argv[]) plugin_fcn;
+/* typedef int (*func)(int argc, char *argv[]) plugin_fcn; */
 
 extern int plain_to_tls(int argc, char *argv[]);
 extern int tls_to_plain(int argc, char *argv[]);
