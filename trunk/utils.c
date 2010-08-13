@@ -94,7 +94,7 @@ int test_usr_grp(char *usr, char *grp) {
 		if ( getgid() != group->gr_gid )
 			exit(GUNNEL_FAILED_GID);
 
-		/* Commence with UID. */
+		/* Continue with UID. */
 		if ( setuid(passwd->pw_uid) < 0 )
 			exit(GUNNEL_FAILED_UID);
 
@@ -206,6 +206,7 @@ int route_content(int source, int sink, int flags) {
  */
 int underpriv_daemon_mode(void) {
 	pid_t pid;
+	gid_t glist[1];
 	struct passwd *passwd;
 	struct group *group;
 
@@ -251,7 +252,15 @@ int underpriv_daemon_mode(void) {
 	if ( setgid(group->gr_gid) < 0 )
 		return GUNNEL_FAILED_GID;
 
-	/* Commence with UID. */
+	/* Make sure that root drops all supplementary groups.
+	 * Since all other users cannot alter these, it makes
+	 * no sense to test the return value.
+	 *
+	 * The value naught is intentional. */
+	glist[0] = group->gr_gid;
+	setgroups(0, glist);
+
+	/* Continue with UID. */
 	if ( setuid(passwd->pw_uid) < 0 )
 		return GUNNEL_FAILED_UID;
 

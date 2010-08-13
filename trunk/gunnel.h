@@ -36,13 +36,13 @@
 #define REMOTE_PORT		'r'
 #define REMOTE_PORT_STR	"[-r port] "
 #define CERT_FILE		'c'
-#define CERT_FILE_STR	"[-c file] "
+#define CERT_FILE_STR	"[-c certfile] "
 #define CA_FILE			'a'
-#define CA_FILE_STR		"[-a file] "
+#define CA_FILE_STR		"[-a cafile] "
 #define KEY_FILE		'k'
-#define KEY_FILE_STR	"[-k file] "
+#define KEY_FILE_STR	"[-k keyfile] "
 #define CIPHER_POLICY	'C'
-#define CIPHER_POLICY_STR	"[-C string] "
+#define CIPHER_POLICY_STR	"[-C ciphers] "
 #define TUNNEL_USR		'u'
 #define TUNNEL_USR_STR	"[-u uid] "
 #define TUNNEL_GRP		'g'
@@ -52,7 +52,7 @@
 
 /* Enumeration of identified errors. */
 enum {
-	GUNNEL_SUCCESS = 0,
+	GUNNEL_SUCCESS = EXIT_SUCCESS,
 	GUNNEL_FORKING,
 	GUNNEL_INVALID_GID,
 	GUNNEL_INVALID_UID,

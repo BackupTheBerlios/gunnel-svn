@@ -209,7 +209,6 @@ static void transmitter(int td, int rd) {
 	fd_set fdset;
 	char recvbuf[2048];
 	gnutls_session_t session;
-	extern gnutls_certificate_credentials_t x509_cred;
 
 	if (init_tls_session(rd, &session, message, sizeof(message))
 		!= EXIT_SUCCESS)
