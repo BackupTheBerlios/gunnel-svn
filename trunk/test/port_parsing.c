@@ -79,9 +79,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (num)
-		fprintf(stderr, "Failed at %d case out of %d possible.\n", num, j);
+		fprintf(stderr, "FAIL: Failed at %d case out of %d possible.\n", num, j);
 	else
-		fprintf(stderr, "Successfully decomposed %d port descriptions.\n", j);
+		fprintf(stderr, "PASS: Successfully decomposed %d port descriptions.\n", j);
 
 	return num;
 } /* main() */

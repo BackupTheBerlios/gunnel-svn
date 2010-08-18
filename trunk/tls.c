@@ -143,24 +143,55 @@ int init_tls_client(char *message, int len) {
     return EXIT_SUCCESS;
 } /* init_tls_client(char *, int) */
 
-int init_tls_session(int fd, gnutls_session_t *session,
-					char *message, int len) {
+int init_tls_client_session(gnutls_session_t *session, char *message, int len) {
 	int rc;
 	const char *errmsg;
 
-	gnutls_init(session, GNUTLS_CLIENT);
+	rc = gnutls_init(session, GNUTLS_CLIENT);
+	if (rc != GNUTLS_E_SUCCESS) {
+		snprintf(message, len, "Session init: %s.\n", gnutls_strerror(rc));
+		if (len > 1)
+			message[len - 1] = '\0';
+		return EXIT_FAILURE;
+	}	
 
 	rc = gnutls_priority_set_direct(*session, ciphers, &errmsg);
-	if (rc == GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_SUCCESS) {
 		snprintf(message, len, "Ciphers: %s.\n", errmsg);
 		if (len > 1)
 			message[len - 1] = '\0';
+		gnutls_deinit(*session);
 		return EXIT_FAILURE;
 	}
 
 	gnutls_credentials_set(*session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-	gnutls_transport_set_ptr(*session, (gnutls_transport_ptr_t) fd);
 
 	return EXIT_SUCCESS;
-} /* init_tls_client(int, gnutls_session_t *, char *, int) */
+} /* init_tls_client_session(gnutls_session_t *, char *, int) */
+
+int init_tls_server_session(gnutls_session_t *session, char *message, int len) {
+	int rc;
+
+	rc = gnutls_init(session, GNUTLS_SERVER);
+	if (rc != GNUTLS_E_SUCCESS) {
+		snprintf(message, len, "Session init: %s.\n", gnutls_strerror(rc));
+		if (len > 1)
+			message[len - 1] = '\0';
+		return EXIT_FAILURE;
+	}	
+
+	rc = gnutls_priority_set(*session, tls_priority_cache);
+	if (rc != GNUTLS_E_SUCCESS) {
+		snprintf(message, len, "Ciphers: %s.\n", gnutls_strerror(rc));
+		if (len > 1)
+			message[len - 1] = '\0';
+		gnutls_deinit(*session);
+		return EXIT_FAILURE;
+	}
+
+	gnutls_credentials_set(*session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	gnutls_certificate_server_set_request(*session, GNUTLS_CERT_REQUEST);
+
+	return EXIT_SUCCESS;
+} /* init_tls_server_session(gnutls_session_t *, char *, int) */
 

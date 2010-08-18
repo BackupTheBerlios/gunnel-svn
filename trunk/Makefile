@@ -14,7 +14,7 @@ SERVICE = gunnel
 
 ALL = $(SERVICE) tests
 
-SUBSERVICE = -DUSE_PLAIN_TO_TLS=1 -DUSE_PLAIN_TO_PLAIN=1
+SUBSERVICE = -DUSE_PLAIN_TO_TLS=1 -DUSE_PLAIN_TO_PLAIN=1 -DUSE_TLS_TO_PLAIN=1
 
 CC = gcc
 
@@ -22,7 +22,8 @@ CFLAGS += $(SUBSERVICE) -O2 -pedantic -Wall $(shell libgnutls-config --cflags)
 
 LDFLAGS += $(shell libgnutls-config --libs)
 
-OBJS = gunnel.o utils.o tls.o plain-to-tls.o plain-to-plain.o
+OBJS = gunnel.o utils.o tls.o plain-to-tls.o plain-to-plain.o \
+	tls-to-plain.o
 
 HEADERS = gunnel.h plugins.h
 

@@ -87,7 +87,9 @@ int init_tls_client(char *msg, int maxlen);
 
 void deinit_tls_client(void);
 
-int init_tls_session(int fd, gnutls_session_t *sess, char *msg, int maxlen);
+int init_tls_client_session(gnutls_session_t *sess, char *msg, int maxlen);
+
+int init_tls_server_session(gnutls_session_t *sess, char *msg, int maxlen);
 
 /* From utils.c */
 void gunnel_error_message(FILE *file, int num);

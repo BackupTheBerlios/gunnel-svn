@@ -1,5 +1,5 @@
 /*
- * plain_to_tls.c  --  receive plain, forward TLS
+ * tls_to_plain.c  --  receive TLS, forward plain
  *
  * Author: Mats Erik Andersson <meand@users.berlios.de>, 2010.
  *
@@ -89,7 +89,7 @@ static void show_info(char *progname) {
 /*
  * Main control for this subsystem.
  */
-int plain_to_tls(int argc, char *argv[]) {
+int tls_to_plain(int argc, char *argv[]) {
 	int opt, rc, sd = -1;
 	char *lhost, *lport;
 	char *rhost, *rport;
@@ -168,7 +168,7 @@ int plain_to_tls(int argc, char *argv[]) {
 	}
 
 	/* Initiate Libgnutls with certificate, key, etcetera. */
-	if (init_tls_client(message, sizeof(message))) {
+	if (init_tls_server(message, sizeof(message))) {
 		fprintf(stderr, "%s\nInit TLS failed!\n", message);
 		return EXIT_FAILURE;
 	}
@@ -197,7 +197,7 @@ int plain_to_tls(int argc, char *argv[]) {
 	close(sd);
 
 	return EXIT_SUCCESS;
-} /* plain_to_tls(int, char *[]) */
+} /* tls_to_plain(int, char *[]) */
 
 static int accept_loop(int sd, char *rhost, char *rport) {
 	int ret, td = -1, rd = -1;
@@ -299,11 +299,11 @@ static void transmitter(int td, int rd) {
 	char recvbuf[2048];
 	gnutls_session_t session;
 
-	if (init_tls_client_session(&session, message, sizeof(message))
+	if (init_tls_server_session(&session, message, sizeof(message))
 			!= EXIT_SUCCESS)
 		again = 0;
 	else
-		gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t) rd);
+		gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t) td);
 
 	while(again) {
 		rc = gnutls_handshake(session);
@@ -344,8 +344,8 @@ static void transmitter(int td, int rd) {
 		}
 
 		/* Orderly content now. */
-		if (FD_ISSET(td, &fdset)) {
-			n = recv(td, &recvbuf, sizeof(recvbuf), 0);
+		if (FD_ISSET(rd, &fdset)) {
+			n = recv(rd, &recvbuf, sizeof(recvbuf), 0);
 
 			if ( (n < 0) && (errno == EINTR) )
 				continue;
@@ -361,10 +361,11 @@ static void transmitter(int td, int rd) {
 				else
 					break;
 			}
+
 			continue;
 		}
 
-		if (FD_ISSET(rd, &fdset)) {
+		if (FD_ISSET(td, &fdset)) {
 			while(1) {
 				n = gnutls_record_recv(session, &recvbuf, sizeof(recvbuf));
 				if ((n == GNUTLS_E_AGAIN) || (n == GNUTLS_E_INTERRUPTED))
@@ -377,7 +378,7 @@ static void transmitter(int td, int rd) {
 				/* Error or orderly shutdown. */
 				break;
 
-			n = send(td, &recvbuf, n, 0);
+			n = send(rd, &recvbuf, n, 0);
 		}
 	}
 
