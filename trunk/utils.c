@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <signal.h>
 #include <pwd.h>
 #include <grp.h>
 

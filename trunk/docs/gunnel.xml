@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <!--
 	vim:set sw=2 ts=2 nocin ai:
+	$Id$
 -->
 
 <!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
@@ -8,8 +9,8 @@
 
 	<!ENTITY fnamn				"<firstname>Mats Erik</firstname>">
 	<!ENTITY enamn				"<surname>Andersson</surname>">
-	<!ENTITY datum-en			"<date>August 13th, 2010</date>">
-	<!ENTITY datum-sv			"<date>13:e augusti 2010</date>">
+	<!ENTITY datum-en			"<date>August 18th, 2010</date>">
+	<!ENTITY datum-sv			"<date>18:e augusti 2010</date>">
 	<!ENTITY epost				"<email>meand@berlios.de</email>">
 	<!ENTITY namn					"Mats Erik Andersson">
 
@@ -103,6 +104,16 @@
 					</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>
+					<option>tls-to-plain</option>
+        </term>
+        <listitem>
+          <para>
+						TLS-krypterat in, men klartext ut.
+					</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
 		<para>
 			Vardera tjänst har sin egen handbokssida.
@@ -111,8 +122,724 @@
 	<refsect1>
 		<title>Se även</title>
 		<para>
-			plain-to-plain(1),
-			plain-to-tls(1)
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
+  <refsect1>
+    <title>Upphovsman</title>
+    <para>
+			Texten har skrivits av &namn;, men må fritt nyttjas för
+			andra ändamål. Mångfaldigande, utgivning och ändring av
+			detta dokument må göras enligt European Union Public License,
+			version 1.0.
+    </para>
+  </refsect1>
+</refentry>
+
+<refentry id="plain-to-plain.sv">
+  <refentryinfo>
+    <address>
+      &epost;
+    </address>
+    <author>
+      &fnamn;
+      &enamn;
+    </author>
+    <copyright>
+      <year>2009</year>
+      <holder>&namn;</holder>
+    </copyright>
+    &datum-sv;
+  </refentryinfo>
+  <refmeta>
+		<refentrytitle>plain-to-plain</refentrytitle>
+		<manvolnum>sv.1</manvolnum>
+		<refmiscinfo class="source">&paket;</refmiscinfo>
+		<refmiscinfo class="version">&version;</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+		<refname>plain-to-plain</refname>
+		<refpurpose>enkel stödjepunkt för TCP-tunnlar.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&program; plain-to-plain</command>
+      <arg choice="req">
+				<arg choice="plain"><option>-l</option></arg>
+				<replaceable class="option">lport</replaceable>
+			</arg>
+      <arg choice="req">
+				<arg choice="plain"><option>-r</option></arg>
+				<replaceable class="option">rport</replaceable>
+			</arg>
+			<group choice="opt">
+				<arg choice="plain"><option>-u</option></arg>
+				<replaceable class="option">uid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-g</option></arg>
+				<replaceable class="option">gid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-o</option></arg>
+			</group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&program; plain-to-plain</command>
+			<group choice="opt">
+				<arg choice="plain"><option>växlar</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-h</option></arg>
+			</group>
+		</cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Beskrivning</title>
+    <para>
+			<command>plain-to-plain</command> en enkel stödjepunkt för
+			att reläa TCP-trafik för TCP-tunnlar. Tjänsten lyssnar
+			på en lokal port och länkar trafiken vidare till en annan
+			port, lokal eller vid en annan maskin.
+		</para>
+  </refsect1>
+  <refsect1>
+    <title>Programväxlar</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+					<option>-h</option>
+        </term>
+        <listitem>
+					<para>
+						Visa möjliga upprop och räkna upp de för ögonblicket
+						utvalda värdena för alla tillgängliga programväxlar.
+						Det förvalda värdet visas om intet annat har valts
+						på kommandoraden.
+					</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+					<option>-o</option>
+        </term>
+        <listitem>
+          <para>
+						Låt den lyssnande porten stängas efter första
+						klientförfrågan.
+					</para>
+        </listitem>
+      </varlistentry>
+			<varlistentry>
+				<term>
+					<option>-l</option> <replaceable class="option">lport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en lyssningsport på den lokala maskinen. Värdet
+						<replaceable class="option">lport</replaceable>
+						är en sträng formad som <emphasis>[host,]port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port. Det frivilliga inslaget
+						<replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-r</option> <replaceable class="option">rport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en port på den mottagande maskinen. Värdet
+						<replaceable class="option">rport</replaceable>
+						är en sträng formad som <emphasis>host,port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port medan <replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-u</option> <replaceable class="option">uid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras som denna användare.
+						Värdet <replaceable class="option">uid</replaceable>
+						är ett numeriskt värde eller ett giltigt användarnamn. Förvalt
+						värde är <systemitem class="username">nobody</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-g</option> <replaceable class="option">gid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras under denna grupp.
+						Värdet <replaceable class="option">gid</replaceable>
+						är ett numeriskt värde eller ett giltigt gruppnamn. Förvalt
+						värde är <systemitem class="groupname">nogroup</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+    </variablelist>
+  </refsect1>
+	<refsect1>
+		<title>Se även</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
+  <refsect1>
+    <title>Upphovsman</title>
+    <para>
+			Texten har skrivits av &namn;, men må fritt nyttjas för
+			andra ändamål. Mångfaldigande, utgivning och ändring av
+			detta dokument må göras enligt European Union Public License,
+			version 1.0.
+    </para>
+  </refsect1>
+</refentry>
+
+<refentry id="plain-to-tls.sv">
+  <refentryinfo>
+    <address>
+      &epost;
+    </address>
+    <author>
+      &fnamn;
+      &enamn;
+    </author>
+    <copyright>
+      <year>2009</year>
+      <holder>&namn;</holder>
+    </copyright>
+    &datum-sv;
+  </refentryinfo>
+  <refmeta>
+		<refentrytitle>plain-to-tls</refentrytitle>
+		<manvolnum>sv.1</manvolnum>
+		<refmiscinfo class="source">&paket;</refmiscinfo>
+		<refmiscinfo class="version">&version;</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+		<refname>plain-to-tls</refname>
+		<refpurpose>en TLS-krypterande TCP-tunnel.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&program; plain-to-tls</command>
+      <arg choice="req">
+				<arg choice="plain"><option>-l</option></arg>
+				<replaceable class="option">lport</replaceable>
+			</arg>
+      <arg choice="req">
+				<arg choice="plain"><option>-r</option></arg>
+				<replaceable class="option">rport</replaceable>
+			</arg>
+			<group choice="opt">
+				<arg choice="plain"><option>-u</option></arg>
+				<replaceable class="option">uid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-g</option></arg>
+				<replaceable class="option">gid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-o</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-c</option></arg>
+				<replaceable class="option">certfil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-a</option></arg>
+				<replaceable class="option">cafil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-k</option></arg>
+				<replaceable class="option">keyfil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-C</option></arg>
+				<replaceable class="option">cprio</replaceable>
+			</group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&program; plain-to-tls</command>
+			<group choice="opt">
+				<arg choice="plain"><option>options</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-h</option></arg>
+			</group>
+		</cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Beskrivning</title>
+    <para>
+      <command>plain-to-tls</command> är en protokollomvandlare och
+			TCP-tunnel. Den lyssnar på en lokal port efter inkommande
+			TCP-trafik och TLS-krypterar denna för vidare befordran
+			till en annan port, lokal eller belägen på en annan maskin.
+		</para>
+  </refsect1>
+  <refsect1>
+    <title>Programväxlar</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+					<option>-h</option>
+        </term>
+        <listitem>
+					<para>
+						Visa möjliga upprop och räkna upp de för ögonblicket
+						utvalda värdena för alla tillgängliga programväxlar.
+						Det förvalda värdet visas om intet annat har valts
+						på kommandoraden.
+					</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+					<option>-o</option>
+        </term>
+        <listitem>
+          <para>
+						Låt den lyssnande porten stängas efter första
+						klientförfrågan.
+					</para>
+        </listitem>
+      </varlistentry>
+			<varlistentry>
+				<term>
+					<option>-l</option> <replaceable class="option">lport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en lyssningsport på den lokala maskinen. Värdet
+						<replaceable class="option">lport</replaceable>
+						är en sträng formad som <emphasis>[host,]port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port. Det frivilliga inslaget
+						<replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-r</option> <replaceable class="option">rport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en port på den mottagande maskinen. Värdet
+						<replaceable class="option">rport</replaceable>
+						är en sträng formad som <emphasis>host,port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port medan <replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-u</option> <replaceable class="option">uid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras som denna användare.
+						Värdet <replaceable class="option">uid</replaceable>
+						är ett numeriskt värde eller ett giltigt användarnamn. Förvalt
+						värde är <systemitem class="username">nobody</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-g</option> <replaceable class="option">gid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras under denna grupp.
+						Värdet <replaceable class="option">gid</replaceable>
+						är ett numeriskt värde eller ett giltigt gruppnamn. Förvalt
+						värde är <systemitem class="groupname">nogroup</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-c</option> <filename>certfil</filename>
+				</term>
+				<listitem>
+					<para>
+						Nyttja den uppgivna filen för autentifiering och kryptering.
+						Filen förutsättes vara ett x509-certificat.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-k</option> <filename>keyfil</filename>
+				</term>
+				<listitem>
+					<para>
+						Den uppgivna filen förutsättes innehålla an kryptonyckel
+						motsvarande det tidigare uppgivna x509-certifikatet.
+						Om denna programväxel utelämnas, då kommer tjänsten att
+						förutsätta kryptonyckelns lagring i samma textfil som
+						den för certifikatet självt.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-a</option> <filename>cafil</filename>
+				</term>
+				<listitem>
+					<para>
+						Den namngivna filen kan nyttjas för att tillhandahålla en
+						certifikatskedja, med vilken x509-certifikatet kan verifieras.
+					</para>
+					<para>
+						Åberopande av denna fil är frivillig, men för det fall att
+						fjärrvärden genomför sträng certifikatsverifiering så kan
+						TLS-autentifieringen slå fel utan denna upplysning.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-C</option> <replaceable>cprio</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Lämna upplysningar om tillåtna metoder för handskakning, kryptering
+						och komprimering av TLS-strömmen.
+					</para>
+					<para>
+						Parametern <replaceable>cprio</replaceable> är en sträng
+						med skönsvärde <emphasis role="bold">NORMAL</emphasis>.
+						Den gängse informationen om
+						<systemitem class="library">libgnutls</systemitem>,
+						liksom om de större nätsidesservrarna -- om de stöder TLS/SSL --
+						kan stå till tjänst med tekniska upplysningar om denna parameter.
+						Särskilt må
+						<citerefentry>
+							<refentrytitle>gnutls_priority_init</refentrytitle>
+							<manvolnum>3</manvolnum>
+						</citerefentry> nämnas som en källa till komprimerad upplysning.
+					</para>
+				</listitem>
+			</varlistentry>
+    </variablelist>
+  </refsect1>
+	<refsect1>
+		<title>Se även</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
+  <refsect1>
+    <title>Upphovsman</title>
+    <para>
+			Texten har skrivits av &namn;, men må fritt nyttjas för
+			andra ändamål. Mångfaldigande, utgivning och ändring av
+			detta dokument må göras enligt European Union Public License,
+			version 1.0.
+    </para>
+  </refsect1>
+</refentry>
+
+<refentry id="tls-to-plain.sv">
+  <refentryinfo>
+    <address>
+      &epost;
+    </address>
+    <author>
+      &fnamn;
+      &enamn;
+    </author>
+    <copyright>
+      <year>2009</year>
+      <holder>&namn;</holder>
+    </copyright>
+    &datum-sv;
+  </refentryinfo>
+  <refmeta>
+		<refentrytitle>tls-to-plain</refentrytitle>
+		<manvolnum>sv.1</manvolnum>
+		<refmiscinfo class="source">&paket;</refmiscinfo>
+		<refmiscinfo class="version">&version;</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+		<refname>tls-to-plain</refname>
+		<refpurpose>en TLS-krypterande TCP-tunnel.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&program; tls-to-plain</command>
+      <arg choice="req">
+				<arg choice="plain"><option>-l</option></arg>
+				<replaceable class="option">lport</replaceable>
+			</arg>
+      <arg choice="req">
+				<arg choice="plain"><option>-r</option></arg>
+				<replaceable class="option">rport</replaceable>
+			</arg>
+			<group choice="opt">
+				<arg choice="plain"><option>-u</option></arg>
+				<replaceable class="option">uid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-g</option></arg>
+				<replaceable class="option">gid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-o</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-c</option></arg>
+				<replaceable class="option">certfil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-a</option></arg>
+				<replaceable class="option">cafil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-k</option></arg>
+				<replaceable class="option">keyfil</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-C</option></arg>
+				<replaceable class="option">cprio</replaceable>
+			</group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&program; tls-to-plain</command>
+			<group choice="opt">
+				<arg choice="plain"><option>växlar</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-h</option></arg>
+			</group>
+		</cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Beskrivning</title>
+    <para>
+      <command>tls-to-plain</command> är en protokollomvandlare och
+			TCP-tunnel. Den lyssnar på en lokal port efter inkommande
+			TLS-krypterad TCP-trafik och leder denna vidare för befordran
+			till en annan port, lokal eller belägen på en annan maskin,
+			men då avkodad av TLS-paketeringen.
+		</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+					<option>-h</option>
+        </term>
+        <listitem>
+					<para>
+						Visa möjliga upprop och räkna upp de för ögonblicket
+						utvalda värdena för alla tillgängliga programväxlar.
+						Det förvalda värdet visas om intet annat har valts
+						på kommandoraden.
+					</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+					<option>-o</option>
+        </term>
+        <listitem>
+          <para>
+						Låt den lyssnande porten stängas efter första
+						klientförfrågan.
+					</para>
+        </listitem>
+      </varlistentry>
+			<varlistentry>
+				<term>
+					<option>-l</option> <replaceable class="option">lport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en lyssningsport på den lokala maskinen. Värdet
+						<replaceable class="option">lport</replaceable>
+						är en sträng formad som <emphasis>[host,]port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port. Det frivilliga inslaget
+						<replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-r</option> <replaceable class="option">rport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Väljer en port på den mottagande maskinen. Värdet
+						<replaceable class="option">rport</replaceable>
+						är en sträng formad som <emphasis>host,port</emphasis>,
+						där <replaceable>port</replaceable> är ett officiellt namn
+						eller en numerisk port medan <replaceable>host</replaceable>
+						är ett lösbart namn, en IPv4-adress eller en IPv6-adress.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-u</option> <replaceable class="option">uid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras som denna användare.
+						Värdet <replaceable class="option">uid</replaceable>
+						är ett numeriskt värde eller ett giltigt användarnamn. Förvalt
+						värde är <systemitem class="username">nobody</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-g</option> <replaceable class="option">gid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Låt den trafikförmedlande processen utföras under denna grupp.
+						Värdet <replaceable class="option">gid</replaceable>
+						är ett numeriskt värde eller ett giltigt gruppnamn. Förvalt
+						värde är <systemitem class="groupname">nogroup</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-c</option> <filename>certfil</filename>
+				</term>
+				<listitem>
+					<para>
+						Nyttja den uppgivna filen för autentifiering och kryptering.
+						Filen förutsättes vara ett x509-certificat.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-k</option> <filename>keyfil</filename>
+				</term>
+				<listitem>
+					<para>
+						Den uppgivna filen förutsättes innehålla an kryptonyckel
+						motsvarande det tidigare uppgivna x509-certifikatet.
+						Om denna programväxel utelämnas, då kommer tjänsten att
+						förutsätta kryptonyckelns lagring i samma textfil som
+						den för certifikatet självt.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-a</option> <filename>cafil</filename>
+				</term>
+				<listitem>
+					<para>
+						Den namngivna filen kan nyttjas för att tillhandahålla en
+						certifikatskedja, med vilken x509-certifikatet kan verifieras.
+					</para>
+					<para>
+						Åberopande av denna fil är frivillig, men för det fall att
+						fjärrvärden genomför sträng certifikatsverifiering så kan
+						TLS-autentifieringen slå fel utan denna upplysning.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-C</option> <replaceable>cprio</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Lämna upplysningar om tillåtna metoder för handskakning, kryptering
+						och komprimering av TLS-strömmen.
+					</para>
+					<para>
+						Parametern <replaceable>cprio</replaceable> är en sträng
+						med skönsvärde <emphasis role="bold">NORMAL</emphasis>.
+						Den gängse informationen om
+						<systemitem class="library">libgnutls</systemitem>,
+						liksom om de större nätsidesservrarna -- om de stöder TLS/SSL --
+						kan stå till tjänst med tekniska upplysningar om denna parameter.
+						Särskilt må
+						<citerefentry>
+							<refentrytitle>gnutls_priority_init</refentrytitle>
+							<manvolnum>3</manvolnum>
+						</citerefentry> nämnas som en källa till komprimerad upplysning.
+					</para>
+				</listitem>
+			</varlistentry>
+    </variablelist>
+  </refsect1>
+	<refsect1>
+		<title>Se även</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
 		</para>
 	</refsect1>
   <refsect1>
@@ -173,10 +900,10 @@
     <title>Description</title>
     <para>
 			<command>&program;</command> is a compound tool to quickly
-			TLS-encrypted or plain TCP-tunnels, locally or to a distant
-			host system. All methods available in 
+			erect plain or TLS-encrypted TCP-tunnels, locally or to a distant
+			host system. The methods supported by
 			<systemitem class="library">libgnutls</systemitem>
-			are usable for encryption and compression.
+			for encryption and compression are applicable to this tool suite.
 			The security functionality is provided by x509v3 certificates.
 		</para>
   </refsect1>
@@ -205,6 +932,16 @@
 					</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>
+					<option>tls-to-plain</option>
+        </term>
+        <listitem>
+          <para>
+						Encrypted input and plain output.
+					</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
 		<para>
 			Each service is described on its own reference page.
@@ -213,8 +950,18 @@
 	<refsect1>
 		<title>See also</title>
 		<para>
-			plain-to-plain(1),
-			plain-to-tls(1)
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
 		</para>
 	</refsect1>
   <refsect1>
@@ -257,19 +1004,19 @@
       <command>&program; plain-to-plain</command>
       <arg choice="req">
 				<arg choice="plain"><option>-l</option></arg>
-				<replaceable class="option"> lport</replaceable>
+				<replaceable class="option">lport</replaceable>
 			</arg>
       <arg choice="req">
 				<arg choice="plain"><option>-r</option></arg>
-				<replaceable class="option"> rport</replaceable>
+				<replaceable class="option">rport</replaceable>
 			</arg>
 			<group choice="opt">
 				<arg choice="plain"><option>-u</option></arg>
-				<replaceable class="option"> uid</replaceable>
+				<replaceable class="option">uid</replaceable>
 			</group>
 			<group choice="opt">
 				<arg choice="plain"><option>-g</option></arg>
-				<replaceable class="option"> gid</replaceable>
+				<replaceable class="option">gid</replaceable>
 			</group>
 			<group choice="opt">
 				<arg choice="plain"><option>-o</option></arg>
@@ -321,6 +1068,36 @@
       </varlistentry>
 			<varlistentry>
 				<term>
+					<option>-l</option> <replaceable class="option">lport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Choose a listening port on the local system. The value
+						<replaceable class="option">lport</replaceable>
+						is a string of the form <emphasis>[host,]port</emphasis>,
+						where <replaceable>port</replaceable> is a service name
+						or a numerical port, and the optional <replaceable>host</replaceable>
+						is a resolvable host name, an IPv4 address, or an IPv6 address.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-r</option> <replaceable class="option">rport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Choose a port to contact at the remote system. The value
+						<replaceable class="option">rport</replaceable>
+						is a string of the form <emphasis>host,port</emphasis>,
+						where <replaceable>port</replaceable> is a service name
+						or a numerical port, and the <replaceable>host</replaceable>
+						is a resolvable host name, an IPv4 address, or an IPv6 address.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
 					<option>-u</option> <replaceable class="option">uid</replaceable>
 				</term>
 				<listitem>
@@ -345,28 +1122,25 @@
 					</para>
 				</listitem>
 			</varlistentry>
-			<varlistentry>
-				<term>
-					<filename class="devicefile">device</filename>
-				</term>
-				<listitem>
-					<para>
-						Use the specified baud rate for serial communication.
-					</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>
-					<replaceable>baudrate</replaceable>
-				</term>
-				<listitem>
-					<para>
-						Use the specified baud rate for serial communication.
-					</para>
-				</listitem>
-			</varlistentry>
     </variablelist>
   </refsect1>
+	<refsect1>
+		<title>See also</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
   <refsect1>
     <title>Author</title>
     <para>
@@ -438,7 +1212,7 @@
 			</group>
 			<group choice="opt">
 				<arg choice="plain"><option>-C</option></arg>
-				<replaceable class="option">ciphers</replaceable>
+				<replaceable class="option">cprio</replaceable>
 			</group>
     </cmdsynopsis>
     <cmdsynopsis>
@@ -586,7 +1360,7 @@
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<option>-C</option> <replaceable>ciphers</replaceable>
+					<option>-C</option> <replaceable>cprio</replaceable>
 				</term>
 				<listitem>
 					<para>
@@ -594,18 +1368,300 @@
 						for use at authentication and encryption in the TLS-protocol.
 					</para>
 					<para>
-						The parameter <replaceable>ciphers</replaceable> is a string
+						The parameter <replaceable>cprio</replaceable> is a string
 						with default value <emphasis role="bold">NORMAL</emphasis>.
 						The usual documentation for
 						<systemitem class="library">libgnutls</systemitem>,
 						as well as for the major web servers (if they can use TLS/SSL),
 						contain further details on the possible contents of this string
-						specifier.
+						specifier. In particular
+						<citerefentry>
+							<refentrytitle>gnutls_priority_init</refentrytitle>
+							<manvolnum>3</manvolnum>
+						</citerefentry> gives a quick overview.
 					</para>
 				</listitem>
 			</varlistentry>
     </variablelist>
   </refsect1>
+	<refsect1>
+		<title>See also</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>tls-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
+  <refsect1>
+    <title>Author</title>
+    <para>
+			This text was written by &namn;. Permission is granted to copy,
+			distribute and/or modify this document under the terms of
+			the European Union Public License, Version 1.0.
+    </para>
+  </refsect1>
+</refentry>
+
+<refentry id="tls-to-plain.en">
+  <refentryinfo>
+    <address>
+      &epost;
+    </address>
+    <author>
+      &fnamn;
+      &enamn;
+    </author>
+    <copyright>
+      <year>2009</year>
+      <holder>&namn;</holder>
+    </copyright>
+    &datum-en;
+  </refentryinfo>
+  <refmeta>
+		<refentrytitle>tls-to-plain</refentrytitle>
+		<manvolnum>1</manvolnum>
+		<refmiscinfo class="source">&paket;</refmiscinfo>
+		<refmiscinfo class="version">&version;</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+		<refname>tls-to-plain</refname>
+		<refpurpose>an encrypting TCP-redirector.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&program; tls-to-plain</command>
+      <arg choice="req">
+				<arg choice="plain"><option>-l</option></arg>
+				<replaceable class="option">lport</replaceable>
+			</arg>
+      <arg choice="req">
+				<arg choice="plain"><option>-r</option></arg>
+				<replaceable class="option">rport</replaceable>
+			</arg>
+			<group choice="opt">
+				<arg choice="plain"><option>-u</option></arg>
+				<replaceable class="option">uid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-g</option></arg>
+				<replaceable class="option">gid</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-o</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-c</option></arg>
+				<replaceable class="option">certfile</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-a</option></arg>
+				<replaceable class="option">cafile</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-k</option></arg>
+				<replaceable class="option">keyfile</replaceable>
+			</group>
+			<group choice="opt">
+				<arg choice="plain"><option>-C</option></arg>
+				<replaceable class="option">cprio</replaceable>
+			</group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&program; tls-to-plain</command>
+			<group choice="opt">
+				<arg choice="plain"><option>options</option></arg>
+			</group>
+			<group choice="req">
+				<arg choice="plain"><option>-h</option></arg>
+			</group>
+		</cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+      <command>tls-to-plain</command> is a protocol converter and
+			TCP-redirector. It listens at a local port for TLS-encrypted
+			TCP-traffic, then decrypts incoming streams, and redirects the
+			content to another port, locally or to a remote host, as plain
+			TCP-traffic.
+		</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+					<option>-h</option>
+        </term>
+        <listitem>
+					<para>
+						Show usage information and list also all values
+						to be used for any options, explicitly set on the
+						the command line, or left at default values.
+					</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+					<option>-o</option>
+        </term>
+        <listitem>
+          <para>
+						Make the listening socket a one-shot service: terminate
+						after the first client connection on the local port.
+					</para>
+        </listitem>
+      </varlistentry>
+			<varlistentry>
+				<term>
+					<option>-l</option> <replaceable class="option">lport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Choose a listening port on the local system. The value
+						<replaceable class="option">lport</replaceable>
+						is a string of the form <emphasis>[host,]port</emphasis>,
+						where <replaceable>port</replaceable> is a service name
+						or a numerical port, and the optional <replaceable>host</replaceable>
+						is a resolvable host name, an IPv4 address, or an IPv6 address.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-r</option> <replaceable class="option">rport</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Choose a port to contact at the remote system. The value
+						<replaceable class="option">rport</replaceable>
+						is a string of the form <emphasis>host,port</emphasis>,
+						where <replaceable>port</replaceable> is a service name
+						or a numerical port, and the <replaceable>host</replaceable>
+						is a resolvable host name, an IPv4 address, or an IPv6 address.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-u</option> <replaceable class="option">uid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Assign the process owner of the listening process. Here
+						<replaceable class="option">uid</replaceable>
+						is numerical or an existing user name. The default value is
+						<systemitem class="username">nobody</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-g</option> <replaceable class="option">gid</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Assign the process group of the listening process. Here
+						<replaceable class="option">gid</replaceable>
+						is numerical or an existing group name. The default value is
+						<systemitem class="groupname">nogroup</systemitem>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-c</option> <filename>certfile</filename>
+				</term>
+				<listitem>
+					<para>
+						Use the indicated file, containing an x509v3-certificate,
+						for authentication and encryption for the redirected traffic.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-k</option> <filename>keyfile</filename>
+				</term>
+				<listitem>
+					<para>
+						Use the indicated file, containing an ascii armoured key
+						that unlocks the above x509v3-certificate.
+						If this option is neglected, then it is assumed that the
+						certificate file contains an embedded cryptographic key
+						structure.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-a</option> <filename>cafile</filename>
+				</term>
+				<listitem>
+					<para>
+						Use the indicated file as containing a trusted certificate chain.
+						The file should containing a chain of certificates that unlocks
+						the above x509v3-certificate.
+					</para>
+					<para>
+						The use of this file is optional, but in case the remote host
+						uses strict client verification, the TLS-authentication may
+						fail on the host side, in case a use of the chain is neglected.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<option>-C</option> <replaceable>cprio</replaceable>
+				</term>
+				<listitem>
+					<para>
+						Specify cipher suites, priorities, and similar restrictions,
+						for use at authentication and encryption in the TLS-protocol.
+					</para>
+					<para>
+						The parameter <replaceable>cprio</replaceable> is a string
+						with default value <emphasis role="bold">NORMAL</emphasis>.
+						The usual documentation for
+						<systemitem class="library">libgnutls</systemitem>,
+						as well as for the major web servers (if they can use TLS/SSL),
+						contain further details on the possible contents of this string
+						specifier. In particular
+						<citerefentry>
+							<refentrytitle>gnutls_priority_init</refentrytitle>
+							<manvolnum>3</manvolnum>
+						</citerefentry> gives a quick overview.
+					</para>
+				</listitem>
+			</varlistentry>
+    </variablelist>
+  </refsect1>
+	<refsect1>
+		<title>See also</title>
+		<para>
+			<citerefentry>
+				<refentrytitle>gunnel</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-plain</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>plain-to-tls</refentrytitle>
+				<manvolnum>1</manvolnum>
+			</citerefentry>.
+		</para>
+	</refsect1>
   <refsect1>
     <title>Author</title>
     <para>
