@@ -11,9 +11,9 @@
 
 ALL = port_parsing
 
-CFLAGS += -O2 -pedantic -Wall $(shell libgnutls-config --cflags)
+CFLAGS += -O2 -pedantic -Wall $(shell pkg-config --cflags gnutls)
 
-LDFLAGS += $(shell libgnutls-config --libs)
+LDFLAGS += $(shell pkg-config --libs gnutls)
 
 port_parsing: port_parsing.c ../utils.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^

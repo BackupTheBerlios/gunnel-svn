@@ -18,9 +18,9 @@ SUBSERVICE = -DUSE_PLAIN_TO_TLS=1 -DUSE_PLAIN_TO_PLAIN=1 -DUSE_TLS_TO_PLAIN=1
 
 CC = gcc
 
-CFLAGS += $(SUBSERVICE) -O2 -pedantic -Wall $(shell libgnutls-config --cflags)
+CFLAGS += $(SUBSERVICE) -O2 -pedantic -Wall $(shell pkg-config --cflags gnutls)
 
-LDFLAGS += $(shell libgnutls-config --libs)
+LDFLAGS += $(shell pkg-config --libs gnutls)
 
 OBJS = gunnel.o utils.o tls.o plain-to-tls.o plain-to-plain.o \
 	tls-to-plain.o
